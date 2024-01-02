@@ -1,11 +1,10 @@
 import { Telegraf } from 'telegraf';
 const { message } = require('telegraf/filters');
 
-import { sub, users } from './commands';
+import { dailyRun, sub, users, addCsv } from './commands';
 import { handleMessage } from './text';
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
-import { addCsv } from './commands/addCsv';
 
 const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const ENVIRONMENT = process.env.NODE_ENV || '';
@@ -16,6 +15,7 @@ bot.command('start', sub());
 bot.command('sub', sub());
 bot.command('users', users());
 bot.command('addCsv', addCsv());
+bot.command('dailyrun', dailyRun());
 bot.on(message('text'), handleMessage());
 
 // bot.on('message', greeting());
