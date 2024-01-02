@@ -22,7 +22,7 @@ interface Question {
   dislikes?: number;
 }
 
-const saveQuestionToDatabase = async (question: Question) => {
+const saveQuestionToDatabase = async (question: Question, ctx: Context) => {
   const conn = connect(config);
 
   try {
@@ -49,6 +49,11 @@ const saveQuestionToDatabase = async (question: Question) => {
     debug('Question data successfully saved to PlanetScale database');
   } catch (error) {
     debug('Error saving question data to PlanetScale database:', error);
+    ctx.reply(
+      `❌ Error! Error saving question to PlanetScale database:\n${
+        question.question || 'no question'
+      }`,
+    );
   }
 };
 
@@ -73,7 +78,7 @@ const addCsv = () => async (ctx: Context) => {
 
     // Save each question to the database
     for (const question of questions) {
-      saveQuestionToDatabase(question);
+      saveQuestionToDatabase(question, ctx);
     }
 
     // Reply to the user
