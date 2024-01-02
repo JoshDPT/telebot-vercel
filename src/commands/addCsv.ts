@@ -62,7 +62,7 @@ const addCsv = () => async (ctx: Context) => {
   parse(csvText, { columns: true }, (err, data) => {
     if (err) {
       debug('Error parsing CSV text:', err);
-      ctx.reply('Error! Error parsing csv provided.');
+      ctx.reply(`❌ Error! ${err.message}`);
       return;
     }
 
@@ -77,7 +77,7 @@ const addCsv = () => async (ctx: Context) => {
     }
 
     // Reply to the user
-    ctx.reply('👍 Success! Questions processed and saved to the database');
+    ctx.reply('✅ Success! Questions processed and saved to the database');
   });
 };
 
