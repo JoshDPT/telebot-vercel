@@ -10,7 +10,7 @@ const config = {
   password: process.env.DATABASE_PASSWORD,
 };
 
-const debug = createDebug('bot:start_command');
+const debug = createDebug('bot:addcsv_command');
 
 interface Question {
   id: number;

@@ -16,19 +16,21 @@ const saveUserDataToDatabase = async (
   lastName: string,
   userID: number,
   subscriptions: string,
+  dateJoined: Date,
 ) => {
   const conn = connect(config);
 
   try {
     // Insert user data into the database
     await conn.execute(
-      `INSERT INTO users (first_name, last_name, user_id, subscriptions)
-      VALUES (?, ?, ?, ?)
+      `INSERT INTO users (first_name, last_name, user_id, subscriptions, date_joined)
+      VALUES (?, ?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE
       first_name = VALUES(first_name),
       last_name = VALUES(last_name),
-      subscriptions = VALUES(subscriptions)`,
-      [firstName, lastName, userID, subscriptions],
+      subscriptions = VALUES(subscriptions),
+      date_joined = values(date_joined)`,
+      [firstName, lastName, userID, subscriptions, dateJoined],
     );
     debug('User data successfully saved to PlanetScale database');
   } catch (error) {
@@ -44,17 +46,27 @@ const start = () => async (ctx: Context) => {
     const last_name = user.last_name || '';
     const userID = user.id;
 
+    const unixDate = ctx.message?.date;
+    const timestampInMilliseconds = unixDate * 1000;
+    const date = isNaN(timestampInMilliseconds)
+      ? new Date()
+      : new Date(timestampInMilliseconds);
+
     // @ts-ignore
     const commandText = ctx.message.text || '';
     const subscriptions =
       commandText.replace('/start', '').trim().replace(' ', ',') || 'general';
 
     // Save user data to the PlanetScale database
-    await saveUserDataToDatabase(first_name, last_name, userID, subscriptions);
-
-    ctx.reply(
-      `User added to subscription: ${first_name}, ${last_name}, ${userID}`,
+    await saveUserDataToDatabase(
+      first_name,
+      last_name,
+      userID,
+      subscriptions,
+      date,
     );
+
+    ctx.reply(`Thank you for joining the bot chat, ${first_name}`);
   }
 };
 

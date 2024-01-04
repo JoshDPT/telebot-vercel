@@ -2,6 +2,7 @@ import createDebug from 'debug';
 import 'dotenv/config';
 import { Context } from 'telegraf';
 import { connect } from '@planetscale/database';
+import { formatDatabaseDate } from '../utils';
 
 const config = {
   host: process.env.DATABASE_HOST,
@@ -9,7 +10,7 @@ const config = {
   password: process.env.DATABASE_PASSWORD,
 };
 
-const debug = createDebug('bot:start_command');
+const debug = createDebug('bot:users_command');
 
 const getUsersFromDatabase = async () => {
   const conn = connect(config);
@@ -24,13 +25,30 @@ const getUsersFromDatabase = async () => {
 };
 
 const users = () => async (ctx: Context) => {
-  // Save user data to the PlanetScale database
+  // Get user data from the PlanetScale database
   const res = await getUsersFromDatabase();
 
-  // ctx.reply(
-  //   `User added to subscription: ${first_name}, ${last_name}, ${userID}`,
-  // );
-  console.log(res?.rows);
+  if (Array.isArray(res?.rows)) {
+    res.rows
+      .sort((a, b) => b.responses_sum - a.responses_sum)
+      .forEach((user, i) => {
+        const {
+          first_name,
+          subscriptions,
+          date_recent_response,
+          responses_sum,
+        } = user;
+        const lead = ['🥇', '🥈', '🥉'];
+
+        ctx.reply(
+          `Name: ${first_name}\nSubs: ${subscriptions
+            .split(',')
+            .join(' ')}\nLast response: ${formatDatabaseDate(
+            date_recent_response,
+          )}\nTotal responses: ${responses_sum} ${lead[i] || null}`,
+        );
+      });
+  }
 };
 
 export { users };

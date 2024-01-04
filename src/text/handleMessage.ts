@@ -9,7 +9,7 @@ const config = {
   password: process.env.DATABASE_PASSWORD,
 };
 
-const debug = createDebug('bot:greeting_text');
+const debug = createDebug('bot:handlMessage');
 
 interface Response {
   user_id: number;
@@ -22,6 +22,31 @@ const replyToMessage = (ctx: Context, messageId: number, string: string) =>
   ctx.reply(string, {
     reply_to_message_id: messageId,
   });
+
+const updateMostRecentResponseDate = async (
+  response: Response,
+  ctx: Context,
+  messageId: number,
+) => {
+  const conn = connect(config);
+
+  try {
+    await conn.execute(
+      `UPDATE users SET date_recent_response = ?, responses_sum = responses_sum + 1 WHERE user_id = ?;`,
+      [response.date, response.user_id],
+    );
+
+    debug('Response date successfully updated in the database');
+  } catch (error) {
+    debug('Error updating response date in database:', error);
+    const errorDatabase = `❌ Error ❌: Error updating response date in database`;
+    if (messageId !== 0) {
+      await replyToMessage(ctx, messageId, errorDatabase);
+    } else {
+      ctx.reply(errorDatabase);
+    }
+  }
+};
 
 const saveResponseToDatabase = async (
   response: Response,
@@ -41,7 +66,7 @@ const saveResponseToDatabase = async (
     debug('Response data successfully saved to the database');
   } catch (error) {
     debug('Error saving response data to the database:', error);
-    const errorDatabase = `Error saving response data to the database.`;
+    const errorDatabase = `❌ Error ❌: Error saving response data to the database.`;
     if (messageId !== 0) {
       await replyToMessage(ctx, messageId, errorDatabase);
     } else {
@@ -129,13 +154,24 @@ const handleMessage = () => async (ctx: Context) => {
       ctx,
       messageId || 0,
     );
+
+    await updateMostRecentResponseDate(
+      {
+        user_id,
+        date,
+        question,
+        response,
+      },
+      ctx,
+      messageId || 0,
+    );
     // You can reply with a confirmation message if needed
     ctx.reply('Response saved successfully!');
 
     try {
       const textDate = formatDate(unixDate);
       const firstName = ctx.message?.from.first_name;
-      const questionResponseCard = `${question}\n\"${response}\"\n${firstName}\n${textDate}`;
+      const questionResponseCard = `${question}\n\n\"${response}\"\n\n${firstName}\n${textDate}`;
 
       const userIDs = await getAllUserIds(ctx, messageId || 0);
 

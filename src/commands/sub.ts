@@ -9,7 +9,7 @@ const config = {
   password: process.env.DATABASE_PASSWORD,
 };
 
-const debug = createDebug('bot:start_command');
+const debug = createDebug('bot:sub_command');
 
 const saveUserDataToDatabase = async (
   firstName: string,

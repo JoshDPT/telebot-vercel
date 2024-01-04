@@ -8,7 +8,7 @@ const config = {
   password: process.env.DATABASE_PASSWORD,
 };
 
-const debug = createDebug('bot:start_command');
+const debug = createDebug('bot:dailyrun_command');
 
 interface Question {
   id: number;
