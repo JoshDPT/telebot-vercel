@@ -28,26 +28,28 @@ const users = () => async (ctx: Context) => {
   // Get user data from the PlanetScale database
   const res = await getUsersFromDatabase();
 
+  const lead = ['🥇', '🥈', '🥉'];
+
   if (Array.isArray(res?.rows)) {
-    res.rows
+    const userString = res.rows
       .sort((a, b) => b.responses_sum - a.responses_sum)
-      .forEach((user, i) => {
+      .map((user, i) => {
         const {
           first_name,
           subscriptions,
           date_recent_response,
           responses_sum,
         } = user;
-        const lead = ['🥇', '🥈', '🥉'];
 
-        ctx.reply(
-          `Name: ${first_name}\nSubs: ${subscriptions
-            .split(',')
-            .join(' ')}\nLast response: ${formatDatabaseDate(
-            date_recent_response,
-          )}\nTotal responses: ${responses_sum} ${lead[i] || null}`,
-        );
-      });
+        return `Name: ${first_name}\nSubs: ${subscriptions
+          .split(',')
+          .join(' ')}\nLast response: ${formatDatabaseDate(
+          date_recent_response,
+        )}\nTotal responses: ${responses_sum} ${lead[i] || null}`;
+      })
+      .join('\n\n');
+
+    ctx.reply(userString);
   }
 };
 
