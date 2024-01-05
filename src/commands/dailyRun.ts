@@ -1,58 +1,12 @@
 import createDebug from 'debug';
 import { Context } from 'telegraf';
-import { connect } from '@planetscale/database';
-import { config } from '../utils';
+import {
+  getAllUserIds,
+  getMonthSpecificQuestion,
+  getRandomQuestion,
+} from '../database';
 
 const debug = createDebug('bot:dailyrun_command');
-
-const getRandomQuestion = async () => {
-  const conn = connect(config);
-
-  try {
-    // Retrieve a random question with month, date, and keyword set to null
-    const result = await conn.execute(
-      'SELECT * FROM questions WHERE month IS NULL AND date IS NULL AND keyword IS NULL ORDER BY RAND() LIMIT 1',
-    );
-
-    return result.rows[0].question;
-  } catch (error) {
-    debug('Error getting random question:', error);
-    throw new Error('Error getting random question from the database');
-  }
-};
-
-const getMonthSpecificQuestion = async () => {
-  // Retrieve a random question with month, date, and keyword set to null
-  const currentMonth = new Date().getMonth() + 1; // Months are 0-indexed in JavaScript
-  const conn = connect(config);
-
-  try {
-    // Check if there is a question for the current month
-    const result = await conn.execute(
-      'SELECT * FROM questions WHERE month = ? ORDER BY RAND() LIMIT 1',
-      [currentMonth],
-    );
-    debug('Success getting month-specific question from database.');
-    return result;
-  } catch (error) {
-    debug('Error getting month-specific question:', error);
-    throw new Error('Error getting month-specific question from the database');
-  }
-};
-
-const getAllUserIds = async () => {
-  const conn = connect(config);
-
-  try {
-    // Retrieve all user IDs from the database
-    const result = await conn.execute('SELECT DISTINCT user_id FROM users');
-    debug('Success getting all user IDs from database.');
-    return result.rows.map((row: any) => row.user_id);
-  } catch (error) {
-    debug('Error getting user IDs:', error);
-    throw new Error('Error getting user IDs from the database');
-  }
-};
 
 const sendQuestionToUsers = async (
   ctx: Context,
@@ -96,5 +50,3 @@ const dailyRun = () => async (ctx: Context) => {
 };
 
 export { dailyRun };
-
-// You can then schedule this daily function using a task scheduler like cron
