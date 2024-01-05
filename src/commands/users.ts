@@ -3,12 +3,7 @@ import 'dotenv/config';
 import { Context } from 'telegraf';
 import { connect } from '@planetscale/database';
 import { formatDatabaseDate } from '../utils';
-
-const config = {
-  host: process.env.DATABASE_HOST,
-  username: process.env.DATABASE_USERNAME,
-  password: process.env.DATABASE_PASSWORD,
-};
+import { config } from '../utils';
 
 const debug = createDebug('bot:users_command');
 
@@ -33,20 +28,18 @@ const users = () => async (ctx: Context) => {
   if (Array.isArray(res?.rows)) {
     const userString = res.rows
       .sort((a, b) => b.responses_sum - a.responses_sum)
-      .map((user, i) => {
-        const {
-          first_name,
-          subscriptions,
-          date_recent_response,
-          responses_sum,
-        } = user;
-
-        return `Name: ${first_name}\nSubs: ${subscriptions
-          .split(',')
-          .join(' ')}\nLast response: ${formatDatabaseDate(
-          date_recent_response,
-        )}\nTotal responses: ${responses_sum} ${lead[i] || null}`;
-      })
+      .map(
+        (
+          { first_name, subscriptions, date_recent_response, responses_sum },
+          index,
+        ) => {
+          return `Name: ${first_name}\nSubs: ${subscriptions
+            .split(',')
+            .join(' ')}\nLast response: ${formatDatabaseDate(
+            date_recent_response,
+          )}\nTotal responses: ${responses_sum} ${lead[index] || null}`;
+        },
+      )
       .join('\n\n');
 
     ctx.reply(userString);

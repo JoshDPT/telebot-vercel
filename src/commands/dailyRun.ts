@@ -1,24 +1,9 @@
 import createDebug from 'debug';
 import { Context } from 'telegraf';
 import { connect } from '@planetscale/database';
-
-const config = {
-  host: process.env.DATABASE_HOST,
-  username: process.env.DATABASE_USERNAME,
-  password: process.env.DATABASE_PASSWORD,
-};
+import { config } from '../utils';
 
 const debug = createDebug('bot:dailyrun_command');
-
-interface Question {
-  id: number;
-  question: string;
-  month?: number | null;
-  date?: string | null;
-  keyword?: string | null;
-  likes?: number;
-  dislikes?: number;
-}
 
 const getRandomQuestion = async () => {
   const conn = connect(config);
@@ -42,7 +27,6 @@ const getAllUserIds = async () => {
   try {
     // Retrieve all user IDs from the database
     const result = await conn.execute('SELECT DISTINCT user_id FROM users');
-
     return result.rows.map((row: any) => row.user_id);
   } catch (error) {
     debug('Error getting user IDs:', error);

@@ -3,24 +3,10 @@ import 'dotenv/config';
 import { Context } from 'telegraf';
 import { connect } from '@planetscale/database';
 import { parse } from 'csv-parse';
-
-const config = {
-  host: process.env.DATABASE_HOST,
-  username: process.env.DATABASE_USERNAME,
-  password: process.env.DATABASE_PASSWORD,
-};
+import { config } from '../utils';
+import { Question } from '../../types';
 
 const debug = createDebug('bot:addcsv_command');
-
-interface Question {
-  id: number;
-  question: string;
-  month?: number | null;
-  date?: string | null;
-  keyword?: string | null;
-  likes?: number;
-  dislikes?: number;
-}
 
 const saveQuestionToDatabase = async (question: Question, ctx: Context) => {
   const conn = connect(config);
@@ -60,7 +46,6 @@ const saveQuestionToDatabase = async (question: Question, ctx: Context) => {
 const addCsv = () => async (ctx: Context) => {
   // @ts-ignore
   const csvText = ctx.message.text.replace('/addCsv', '').trim();
-
   const questions: Question[] = [];
 
   // Use csv-parse to parse the CSV text

@@ -2,33 +2,25 @@ import createDebug from 'debug';
 import 'dotenv/config';
 import { Context } from 'telegraf';
 import { connect } from '@planetscale/database';
-
-const config = {
-  host: process.env.DATABASE_HOST,
-  username: process.env.DATABASE_USERNAME,
-  password: process.env.DATABASE_PASSWORD,
-};
+import { config } from '../utils';
 
 const debug = createDebug('bot:sub_command');
 
-const saveUserDataToDatabase = async (
-  firstName: string,
-  lastName: string,
-  userID: number,
-  subscriptions: string,
-) => {
+interface SubUser {
+  userID: number;
+  subscriptions: string;
+}
+
+const saveUserDataToDatabase = async ({ userID, subscriptions }: SubUser) => {
   const conn = connect(config);
 
   try {
-    // Insert user data into the database
+    // update subscriptions
     await conn.execute(
-      `INSERT INTO users (first_name, last_name, user_id, subscriptions)
-      VALUES (?, ?, ?, ?)
-      ON DUPLICATE KEY UPDATE
-      first_name = VALUES(first_name),
-      last_name = VALUES(last_name),
-      subscriptions = VALUES(subscriptions)`,
-      [firstName, lastName, userID, subscriptions],
+      `UPDATE users
+       SET subscriptions = ?
+       WHERE user_id = ?`,
+      [subscriptions, userID],
     );
     debug('User data successfully saved to PlanetScale database');
   } catch (error) {
@@ -40,21 +32,25 @@ const sub = () => async (ctx: Context) => {
   const user = ctx.message?.from;
 
   if (user) {
-    const first_name = user.first_name || '';
-    const last_name = user.last_name || '';
     const userID = user.id;
 
     // @ts-ignore
     const commandText = ctx.message.text || '';
-    const subscriptions =
-      commandText.replace('/sub', '').trim().replace(' ', ',') || 'general';
+    const subs: string = commandText.replace('/sub', '').trim();
 
-    // Save user data to the PlanetScale database
-    await saveUserDataToDatabase(first_name, last_name, userID, subscriptions);
+    if (subs) {
+      const subscriptions = subs.replace(' ', ',');
+      // Save user data to the PlanetScale database
+      await saveUserDataToDatabase({ userID, subscriptions });
 
-    ctx.reply(
-      `User added to subscription: ${first_name}, ${last_name}, ${userID}`,
-    );
+      ctx.reply(
+        `Updated subscriptions to ${subscriptions.split(',').join(' ')}`,
+      );
+    } else {
+      ctx.reply(
+        `Please include subscription strings after command like so:\n/sub general child`,
+      );
+    }
   }
 };
 

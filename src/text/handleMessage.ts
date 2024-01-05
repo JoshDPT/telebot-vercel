@@ -2,21 +2,10 @@ import { Context } from 'telegraf';
 import createDebug from 'debug';
 import { connect } from '@planetscale/database';
 import { formatDate } from '../utils';
-
-const config = {
-  host: process.env.DATABASE_HOST,
-  username: process.env.DATABASE_USERNAME,
-  password: process.env.DATABASE_PASSWORD,
-};
+import { config } from '../utils';
+import { Response } from '../../types';
 
 const debug = createDebug('bot:handlMessage');
-
-interface Response {
-  user_id: number;
-  date?: Date;
-  question: string;
-  response: string;
-}
 
 const replyToMessage = (ctx: Context, messageId: number, string: string) =>
   ctx.reply(string, {
