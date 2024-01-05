@@ -21,12 +21,32 @@ const getRandomQuestion = async () => {
   }
 };
 
+const getMonthSpecificQuestion = async () => {
+  // Retrieve a random question with month, date, and keyword set to null
+  const currentMonth = new Date().getMonth() + 1; // Months are 0-indexed in JavaScript
+  const conn = connect(config);
+
+  try {
+    // Check if there is a question for the current month
+    const result = await conn.execute(
+      'SELECT * FROM questions WHERE month = ? ORDER BY RAND() LIMIT 1',
+      [currentMonth],
+    );
+    debug('Success getting month-specific question from database.');
+    return result;
+  } catch (error) {
+    debug('Error getting month-specific question:', error);
+    throw new Error('Error getting month-specific question from the database');
+  }
+};
+
 const getAllUserIds = async () => {
   const conn = connect(config);
 
   try {
     // Retrieve all user IDs from the database
     const result = await conn.execute('SELECT DISTINCT user_id FROM users');
+    debug('Success getting all user IDs from database.');
     return result.rows.map((row: any) => row.user_id);
   } catch (error) {
     debug('Error getting user IDs:', error);
@@ -53,16 +73,9 @@ const sendQuestionToUsers = async (
 
 const dailyRun = () => async (ctx: Context) => {
   try {
-    const currentMonth = new Date().getMonth() + 1; // Months are 0-indexed in JavaScript
-    const conn = connect(config);
-
-    // Check if there is a question for the current month
-    const result = await conn.execute(
-      'SELECT * FROM questions WHERE month = ? ORDER BY RAND() LIMIT 1',
-      [currentMonth],
-    );
-
     let selectedQuestion;
+
+    const result = await getMonthSpecificQuestion();
 
     if (result.size === 0) {
       // If there is no question for the current month, get a random question
