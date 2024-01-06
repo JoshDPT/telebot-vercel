@@ -18,12 +18,6 @@ bot.command('addcsv', addCsv());
 bot.command('dailyrun', dailyRun());
 bot.on(message('text'), handleMessage());
 
-// bot.on('message', greeting());
-// bot.start((ctx) => ctx.reply('Welcome'));
-// bot.help((ctx) => ctx.reply('Send me a sticker'));
-// bot.on(message('sticker'), (ctx) => ctx.reply('👍'));
-// bot.hears('hi', (ctx) => ctx.reply('Hey there'));
-
 //prod mode (Vercel)
 export const startVercel = async (req: VercelRequest, res: VercelResponse) => {
   await production(req, res, bot);
