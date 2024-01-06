@@ -5,3 +5,6 @@ export * from './get-month-question';
 export * from './get-random-question';
 export * from './save-user';
 export * from './update-subs';
+export * from './get-keyword-question';
+export * from './save-response';
+export * from './update-user-response-date';

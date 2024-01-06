@@ -2,28 +2,13 @@ import createDebug from 'debug';
 import { Context } from 'telegraf';
 import {
   getAllUserIds,
+  getKeywordQuestion,
   getMonthSpecificQuestion,
   getRandomQuestion,
 } from '../database';
+import { sendMessageAllUsers } from '../telegram';
 
 const debug = createDebug('bot:dailyrun_command');
-
-const sendQuestionToUsers = async (
-  ctx: Context,
-  question: string,
-  userIDs: number[],
-) => {
-  try {
-    // Send the question to all users
-    for (const userID of userIDs) {
-      await ctx.telegram.sendMessage(userID, question);
-    }
-    debug('Question sent to all users');
-  } catch (error) {
-    debug('Error sending question to users:', error);
-    throw new Error('Error sending question to users');
-  }
-};
 
 const dailyRun = () => async (ctx: Context) => {
   try {
@@ -40,10 +25,19 @@ const dailyRun = () => async (ctx: Context) => {
     }
 
     // Get all user IDs
-    const userIDs = await getAllUserIds();
+    const userIDs = await getAllUserIds(ctx);
 
     // Send the selected question to all users
-    await sendQuestionToUsers(ctx, selectedQuestion, userIDs);
+    if (userIDs && selectedQuestion) {
+      await sendMessageAllUsers(ctx, selectedQuestion, userIDs);
+    }
+
+    const childQuestion = await getKeywordQuestion('child');
+
+    // Send the selected question to all users
+    if (userIDs && childQuestion) {
+      await sendMessageAllUsers(ctx, childQuestion, userIDs);
+    }
   } catch (error) {
     debug('Error in daily question task:', error);
   }

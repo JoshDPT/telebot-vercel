@@ -4,7 +4,7 @@ import { connect } from '@planetscale/database';
 import { config } from '../utils';
 import { UserModel } from '../../types';
 
-const debug = createDebug('bot:start_command');
+const debug = createDebug('bot:save-user');
 
 const saveUserDataToDatabase = async ({
   first_name,

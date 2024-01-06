@@ -1,111 +1,14 @@
 import { Context } from 'telegraf';
 import createDebug from 'debug';
-import { connect } from '@planetscale/database';
 import { formatDate } from '../utils';
-import { config } from '../utils';
-import { Response } from '../../types';
+import {
+  saveResponseToDatabase,
+  updateUserResponseDate,
+  getAllUserIds,
+} from '../database';
+import { sendMessageAllUsers, replyToMessage } from '../telegram';
 
 const debug = createDebug('bot:handlMessage');
-
-const replyToMessage = (ctx: Context, messageId: number, string: string) =>
-  ctx.reply(string, {
-    reply_to_message_id: messageId,
-  });
-
-const updateMostRecentResponseDate = async (
-  response: Response,
-  ctx: Context,
-  messageId: number,
-) => {
-  const conn = connect(config);
-
-  try {
-    await conn.execute(
-      `UPDATE users SET date_recent_response = ?, responses_sum = responses_sum + 1 WHERE user_id = ?;`,
-      [response.date, response.user_id],
-    );
-
-    debug('Response date successfully updated in the database');
-  } catch (error) {
-    debug('Error updating response date in database:', error);
-    const errorDatabase = `❌ Error ❌: Error updating response date in database`;
-    if (messageId !== 0) {
-      await replyToMessage(ctx, messageId, errorDatabase);
-    } else {
-      ctx.reply(errorDatabase);
-    }
-  }
-};
-
-const saveResponseToDatabase = async (
-  response: Response,
-  ctx: Context,
-  messageId: number,
-) => {
-  const conn = connect(config);
-
-  try {
-    // Insert response data into the database
-    await conn.execute(
-      `INSERT INTO responses (user_id, date, question, response)
-      VALUES (?, ?, ?, ?)`,
-      [response.user_id, response.date, response.question, response.response],
-    );
-
-    debug('Response data successfully saved to the database');
-  } catch (error) {
-    debug('Error saving response data to the database:', error);
-    const errorDatabase = `❌ Error ❌: Error saving response data to the database.`;
-    if (messageId !== 0) {
-      await replyToMessage(ctx, messageId, errorDatabase);
-    } else {
-      ctx.reply(errorDatabase);
-    }
-  }
-};
-
-const getAllUserIds = async (ctx: Context, messageId: number) => {
-  const conn = connect(config);
-
-  try {
-    // Retrieve all user IDs from the database
-    const result = await conn.execute('SELECT DISTINCT user_id FROM users');
-
-    debug('Success in getting all users from database');
-    return result.rows.map((row: any) => row.user_id);
-  } catch (error) {
-    debug('Error getting user IDs:', error);
-    const errorGetUsers = '❌ Error ❌:\nError getting users from database.';
-    if (messageId) {
-      await replyToMessage(ctx, messageId, errorGetUsers);
-    } else {
-      ctx.reply(errorGetUsers);
-    }
-  }
-};
-
-const sendQuestionToUsers = async (
-  ctx: Context,
-  question: string,
-  userIDs: number[],
-  messageId: number,
-) => {
-  try {
-    // Send the question to all users
-    for (const userID of userIDs) {
-      await ctx.telegram.sendMessage(userID, question);
-    }
-    debug('Response sent to all users');
-  } catch (error) {
-    debug('Error sending question to users:', error);
-    const pleaseReply = '❌ Error ❌:\nError sending response to all users.';
-    if (messageId) {
-      await replyToMessage(ctx, messageId, pleaseReply);
-    } else {
-      ctx.reply(pleaseReply);
-    }
-  }
-};
 
 const handleMessage = () => async (ctx: Context) => {
   debug('Triggered "handleMessage" text command');
@@ -141,10 +44,9 @@ const handleMessage = () => async (ctx: Context) => {
         response,
       },
       ctx,
-      messageId || 0,
     );
 
-    await updateMostRecentResponseDate(
+    await updateUserResponseDate(
       {
         user_id,
         date,
@@ -152,7 +54,6 @@ const handleMessage = () => async (ctx: Context) => {
         response,
       },
       ctx,
-      messageId || 0,
     );
     // You can reply with a confirmation message if needed
     ctx.reply('Response saved successfully!');
@@ -162,15 +63,10 @@ const handleMessage = () => async (ctx: Context) => {
       const firstName = ctx.message?.from.first_name;
       const questionResponseCard = `${question}\n\n\"${response}\"\n\n${firstName}\n${textDate}`;
 
-      const userIDs = await getAllUserIds(ctx, messageId || 0);
+      const userIDs = await getAllUserIds(ctx);
 
       if (userIDs) {
-        await sendQuestionToUsers(
-          ctx,
-          questionResponseCard,
-          userIDs,
-          messageId || 0,
-        );
+        await sendMessageAllUsers(ctx, questionResponseCard, userIDs);
         debug('Successfully sent response card to all users');
       }
       // Send the selected question to all users

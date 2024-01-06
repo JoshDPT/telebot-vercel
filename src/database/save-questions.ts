@@ -4,7 +4,7 @@ import { connect } from '@planetscale/database';
 import { config } from '../utils';
 import createDebug from 'debug';
 
-const debug = createDebug('bot:addcsv_command');
+const debug = createDebug('bot:save-questions');
 
 const saveQuestionToDatabase = async (question: Question, ctx: Context) => {
   const conn = connect(config);

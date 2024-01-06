@@ -2,7 +2,7 @@ import createDebug from 'debug';
 import { connect } from '@planetscale/database';
 import { config } from '../utils';
 
-const debug = createDebug('bot:dailyrun_command');
+const debug = createDebug('bot:get-random-question');
 
 const getRandomQuestion = async () => {
   const conn = connect(config);

@@ -2,7 +2,7 @@ import createDebug from 'debug';
 import { connect } from '@planetscale/database';
 import { config } from '../utils';
 
-const debug = createDebug('bot:dailyrun_command');
+const debug = createDebug('bot:get-month-question');
 
 const getMonthSpecificQuestion = async () => {
   // Retrieve a random question with month, date, and keyword set to null

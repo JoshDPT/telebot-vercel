@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { connect } from '@planetscale/database';
 import { config } from '../utils';
 
-const debug = createDebug('bot:sub_command');
+const debug = createDebug('bot:update-subs');
 
 interface SubUser {
   userID: number;
