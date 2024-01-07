@@ -22,9 +22,9 @@ const leaderboard = () => async (ctx: Context) => {
     const header = `| Name${' '.repeat(
       maxName - 4,
     )} | Total | Streak | Score${' '.repeat(5)} |\n`;
-    const beam = `+-----${' '.repeat(
+    const beam = `+-----${'-'.repeat(
       maxName - 4,
-    )}-+-------+--------+------${' '.repeat(5)}-+\n`;
+    )}-+-------+--------+------${'-'.repeat(5)}-+\n`;
 
     const userString = scoreArray
       .sort((a, b) => b.score - a.score)
