@@ -19,26 +19,18 @@ const leaderboard = () => async (ctx: Context) => {
       },
     );
 
-    const header = `| Name${' '.repeat(
-      maxName - 4,
-    )} | Total | Streak | Score |\n`;
-    const beam = `+-${'-'.repeat(maxName)}-+-------+--------+-${'-'.repeat(
-      5,
-    )}-+\n`;
+    const header = `Name${' '.repeat(maxName - 4)} | Total | Streak | Score\n`;
 
-    const userString =
-      scoreArray
-        .sort((a, b) => b.score - a.score)
-        .map(({ first_name, responses_sum, current_streak, score }) => {
-          return `| ${first_name.padEnd(maxName)} | ${String(
-            responses_sum,
-          ).padEnd(5)} | ${String(current_streak).padEnd(6)} | ${String(
-            score,
-          ).padEnd(5)} |`;
-        })
-        .join(`\n${beam}`) + '\n';
+    const userString = scoreArray
+      .sort((a, b) => b.score - a.score)
+      .map(({ first_name, responses_sum, current_streak, score }) => {
+        return `${first_name.padEnd(maxName)} | ${String(responses_sum).padEnd(
+          5,
+        )} | ${String(current_streak).padEnd(6)} | ${String(score).padEnd(5)}`;
+      })
+      .join(`\n`);
 
-    ctx.replyWithHTML([`<pre>`, header, userString, `</pre>`].join(beam));
+    ctx.replyWithHTML(`<pre>` + header + userString + `</pre>`);
   }
 };
 
