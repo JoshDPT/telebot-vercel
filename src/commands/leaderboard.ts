@@ -21,21 +21,22 @@ const leaderboard = () => async (ctx: Context) => {
 
     const header = `| Name${' '.repeat(
       maxName - 4,
-    )} | Total | Streak | Score${' '.repeat(5)} |\n`;
-    const beam = `+-----${'-'.repeat(
-      maxName,
-    )}-+-------+--------+------${'-'.repeat(5)}-+\n`;
+    )} | Total | Streak | Score |\n`;
+    const beam = `+-${'-'.repeat(maxName)}-+-------+--------+-${'-'.repeat(
+      5,
+    )}-+\n`;
 
-    const userString = scoreArray
-      .sort((a, b) => b.score - a.score)
-      .map(({ first_name, responses_sum, current_streak, score }) => {
-        return `| ${first_name.padEnd(maxName)} | ${String(
-          responses_sum,
-        ).padEnd(5)} | ${String(current_streak).padEnd(6)} | ${String(
-          score,
-        ).padEnd(10)} |`;
-      })
-      .join(`\n${beam}`);
+    const userString =
+      scoreArray
+        .sort((a, b) => b.score - a.score)
+        .map(({ first_name, responses_sum, current_streak, score }) => {
+          return `| ${first_name.padEnd(maxName)} | ${String(
+            responses_sum,
+          ).padEnd(5)} | ${String(current_streak).padEnd(6)} | ${String(
+            score,
+          ).padEnd(5)} |`;
+        })
+        .join(`\n${beam}`) + '\n';
 
     ctx.replyWithHTML([`<pre>`, header, userString, `</pre>`].join(beam));
   }
