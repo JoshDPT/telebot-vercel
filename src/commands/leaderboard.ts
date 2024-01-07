@@ -23,7 +23,7 @@ const leaderboard = () => async (ctx: Context) => {
       maxName - 4,
     )} | Total | Streak | Score${' '.repeat(5)} |\n`;
     const beam = `+-----${'-'.repeat(
-      maxName - 4,
+      maxName,
     )}-+-------+--------+------${'-'.repeat(5)}-+\n`;
 
     const userString = scoreArray
