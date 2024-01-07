@@ -3,7 +3,7 @@ import 'dotenv/config';
 import { connect } from '@planetscale/database';
 import { config } from '../utils';
 
-const debug = createDebug('bot:users_command');
+const debug = createDebug('bot:get-all-user-data');
 
 const getUsersFromDatabase = async () => {
   const conn = connect(config);

@@ -3,7 +3,7 @@ import createDebug from 'debug';
 import { formatDate } from '../utils';
 import {
   saveResponseToDatabase,
-  updateUserResponseDate,
+  updateUserResponseData,
   getAllUserIds,
 } from '../database';
 import { sendMessageAllUsers, replyToMessage } from '../telegram';
@@ -46,7 +46,7 @@ const handleMessage = () => async (ctx: Context) => {
       ctx,
     );
 
-    await updateUserResponseDate(
+    await updateUserResponseData(
       {
         user_id,
         date,

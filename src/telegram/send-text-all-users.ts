@@ -2,7 +2,7 @@ import { Context } from 'telegraf';
 import createDebug from 'debug';
 import { replyToMessage } from './reply-to-message';
 
-const debug = createDebug('bot:handlMessage');
+const debug = createDebug('bot:send-text-all-users');
 
 const sendMessageAllUsers = async (
   ctx: Context,

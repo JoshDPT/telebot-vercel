@@ -1,7 +1,7 @@
 import { Telegraf } from 'telegraf';
 const { message } = require('telegraf/filters');
 
-import { dailyRun, sub, users, addCsv, start } from './commands';
+import { dailyRun, sub, users, addCsv, start, leaderboard } from './commands';
 import { handleMessage } from './text';
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
@@ -16,6 +16,7 @@ bot.command('sub', sub());
 bot.command('users', users());
 bot.command('addcsv', addCsv());
 bot.command('dailyrun', dailyRun());
+bot.command('leaderboard', leaderboard());
 bot.on(message('text'), handleMessage());
 
 //prod mode (Vercel)
