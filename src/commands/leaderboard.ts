@@ -19,14 +19,14 @@ const leaderboard = () => async (ctx: Context) => {
       },
     );
 
-    const header = `*Name${' '.repeat(
+    const header = `<b>Name${'&nbsp;'.repeat(
       maxName - 4,
-    )} | Total | Streak | Score*\n`;
+    )} | Total | Streak | Score</b>\n`;
 
     const userString = scoreArray
       .sort((a, b) => b.score - a.score)
       .map(({ first_name, responses_sum, current_streak, score }) => {
-        return `*${first_name.padEnd(maxName)}* | ${String(
+        return `<b>${first_name.padEnd(maxName)}</b> | ${String(
           responses_sum,
         ).padEnd(6)} | ${String(current_streak).padEnd(6)} | ${String(
           score,
@@ -34,7 +34,7 @@ const leaderboard = () => async (ctx: Context) => {
       })
       .join('\n');
 
-    ctx.replyWithMarkdownV2(header + userString);
+    ctx.replyWithHTML(header + userString);
   }
 };
 
