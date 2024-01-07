@@ -19,22 +19,19 @@ const leaderboard = () => async (ctx: Context) => {
       },
     );
 
-    const header = `<pre>
-Name${' '.repeat(maxName - 4)} | Total | Streak | Score
-</pre>`;
+    const header = `Name${' '.repeat(maxName - 4)} | Total | Streak | Score\n`;
 
     const userString = scoreArray
       .sort((a, b) => b.score - a.score)
       .map(({ first_name, responses_sum, current_streak, score }) => {
-        return `<pre>
-${first_name.padEnd(maxName)} | ${String(responses_sum).padEnd(6)} | ${String(
-          current_streak,
-        ).padEnd(6)} | ${String(score).padEnd(10)}
-</pre>`;
-      })
-      .join('\n');
+        return `${first_name.padEnd(maxName)} | ${String(responses_sum).padEnd(
+          5,
+        )} | ${String(current_streak).padEnd(6)} | ${String(score).padEnd(
+          10,
+        )}\n`;
+      });
 
-    ctx.replyWithHTML(header + userString);
+    ctx.replyWithHTML('<pre>' + header + userString + '</pre>');
   }
 };
 
