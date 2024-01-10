@@ -9,7 +9,7 @@ const debug = createDebug('bot:addcsv_command');
 
 const addCsv = () => async (ctx: Context) => {
   // @ts-ignore
-  const csvText = ctx.message.text.replace('/addCsv', '').trim();
+  const csvText = ctx.message.text.replace('/addcsv', '').trim();
   const questions: Question[] = [];
 
   // Use csv-parse to parse the CSV text
