@@ -20,8 +20,6 @@ bot.command('addcsv', addCsv());
 bot.command('dailyrun', dailyRun());
 bot.command('score', getScore());
 
-bot.on(message('text'), handleMessage());
-
 bot.command('simple', (ctx) => {
   return ctx.replyWithHTML(
     '<b>Coke</b> or <i>Pepsi?</i>',
@@ -38,6 +36,8 @@ bot.command('inline', (ctx) => {
     ]),
   });
 });
+
+bot.on(message('text'), handleMessage());
 
 //prod mode (Vercel)
 export const startVercel = async (req: VercelRequest, res: VercelResponse) => {
