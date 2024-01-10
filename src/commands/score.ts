@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { Context } from 'telegraf';
 import { getUsersFromDatabase } from '../database';
 
-const leaderboard = () => async (ctx: Context) => {
+const getScore = () => async (ctx: Context) => {
   // Get user data from the PlanetScale database
   const res = await getUsersFromDatabase();
 
@@ -34,4 +34,4 @@ const leaderboard = () => async (ctx: Context) => {
   }
 };
 
-export { leaderboard };
+export { getScore };
