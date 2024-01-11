@@ -1,5 +1,5 @@
 export interface Question {
-  id: number;
+  id?: number;
   question: string;
   month?: number | null;
   date?: string | null;
