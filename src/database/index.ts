@@ -8,3 +8,4 @@ export * from './save-response';
 export * from './save-user';
 export * from './update-subs';
 export * from './update-user-response-data';
+export * from './search-responses';

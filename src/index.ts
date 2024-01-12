@@ -6,6 +6,7 @@ import { handleMessage } from './text';
 
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { development, production } from './core';
+import { search } from './commands/search';
 
 const BOT_TOKEN = process.env.BOT_TOKEN || '';
 const ENVIRONMENT = process.env.NODE_ENV || '';
@@ -19,6 +20,7 @@ bot.command('users', users());
 bot.command('addcsv', addCsv());
 bot.command('dailyrun', dailyRun());
 bot.command('score', getScore());
+bot.command('search', search());
 
 bot.command('simple', (ctx) => {
   return ctx.replyWithHTML(

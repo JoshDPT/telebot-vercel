@@ -88,3 +88,8 @@ export interface ResponseModel {
   question: string;
   response: string;
 }
+
+export interface SearchResponsesProps {
+  searchText: string;
+  page?: string;
+}
